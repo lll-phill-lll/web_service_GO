@@ -11,7 +11,7 @@ import (
 	// "time" // to get "running"" status
 )
 
-type userRequest struct {
+type userRequest struct { // unique struct for each request
 	md5   string
 	url   string
 	ready bool
@@ -21,10 +21,11 @@ type userRequest struct {
 
 var mu = &sync.Mutex{} // add mutex to avoid race condition (to check use -race flag while compiling)
 
-var allRequests = make(map[string]userRequest)
+var allRequests = make(map[string]userRequest) // map to store all the requests
 
 func handlerCheck(w http.ResponseWriter, r *http.Request) {
 	myParam := r.URL.Query().Get("id")
+
 	if myParam != "" {
 		myParam += "\n"
 		mu.Lock()
@@ -49,25 +50,39 @@ func handlerCheck(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func startMD5(url string, uniqueID string) error {
-	response, _ := http.Get(url)
+func startMD5(url string, uniqueID string) {
+	response, er := http.Get(url)
+	if er != nil {
+		fmt.Println("Get url error. ID=", uniqueID)
+	}
 
-	defer response.Body.Close()
+	var body []byte
+	if er == nil {
+		defer response.Body.Close()
 
-	body, _ := ioutil.ReadAll(response.Body)
+		body, er = ioutil.ReadAll(response.Body)
+		if er != nil {
+			fmt.Println("Error while getting file body. ID=", uniqueID)
+		}
+	}
 
 	hasher := md5.New()
-	hasher.Write(body)
+	if er == nil {
+		hasher.Write(body)
+	}
 
 	// time.Sleep(25 * time.Second) // to get "running" status
 	mu.Lock()
 	thisRequest := allRequests[uniqueID]
 	thisRequest.ready = true
-	thisRequest.md5 = hex.EncodeToString(hasher.Sum(nil))
+	if er == nil { // check if there errors while saving file and computing md5
+		thisRequest.md5 = hex.EncodeToString(hasher.Sum(nil))
+	} else {
+		thisRequest.er = true
+	}
 	delete(allRequests, uniqueID)
 	allRequests[uniqueID] = thisRequest
 	mu.Unlock()
-	return nil
 }
 
 func handleSubmit(w http.ResponseWriter, r *http.Request) {
@@ -78,7 +93,11 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
 
 	urlToUse := r.FormValue("url")
 
-	byteID, _ := exec.Command("uuidgen").Output()
+	byteID, er := exec.Command("uuidgen").Output() // use POSIX command to generate unique key
+	if er != nil {
+		fmt.Fprintln(w, "uuidgen error, can't generate id")
+		return
+	}
 	uniqueID := string(byteID)
 	var req userRequest = userRequest{
 		id:  uniqueID,
@@ -89,9 +108,11 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
 	allRequests[uniqueID] = req
 	mu.Unlock()
 
-	fmt.Fprintln(w, "your id:", uniqueID)
-
-	f, _ := w.(http.Flusher)
+	f, erBool := w.(http.Flusher)
+	if erBool == true {
+		fmt.Fprintln(w, "Flush error, can't print id")
+		return
+	}
 	f.Flush()
 
 	go startMD5(urlToUse, uniqueID) // each process starts in it's own goroutine
@@ -103,7 +124,6 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-
 	http.HandleFunc("/submit", handleSubmit)
 	http.HandleFunc("/check", handlerCheck)
 	http.HandleFunc("/", handleRoot)

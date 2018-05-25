@@ -19,4 +19,9 @@ The following commands should be written in another terminal when the server is 
 >>> curl -X GET http://localhost:8000/check?id=0e4fac17-f367-4807-8c28-8a059a2f82ac
 	{"md5":"f4afe93ad799484b1d512cc20e93efd1","status":"done","url":"http://site.com/file.txt"}
 ```
-
+## Run instructions:
+* To run the program you need the GOlang compiler.
+* Clone this repository and go to its folder.
+* Run `go run serv1.go`
+* Open new terminal and POST or GET command with port number, given after server run (default - 8080).
+* You can use one of folo
