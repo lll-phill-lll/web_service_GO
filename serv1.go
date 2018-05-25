@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os/exec"
 	"sync"
-	// "time" // to get "running"" status
+	"time" // to get "running"" status
 )
 
 type userRequest struct { // unique struct for each request
@@ -71,7 +71,7 @@ func startMD5(url string, uniqueID string) {
 		hasher.Write(body)
 	}
 
-	// time.Sleep(25 * time.Second) // to get "running" status
+	time.Sleep(0 * time.Second) // to get "running" status
 	mu.Lock()
 	thisRequest := allRequests[uniqueID]
 	thisRequest.ready = true
@@ -87,7 +87,7 @@ func startMD5(url string, uniqueID string) {
 
 func handleSubmit(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		fmt.Fprintln(w, "Should be method POST")
+		fmt.Fprintln(w, "Should be method POST with /submit")
 		return
 	}
 
@@ -110,7 +110,7 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
 
 	f, erBool := w.(http.Flusher)
 	if erBool == true {
-		fmt.Fprintln(w, "Flush error, can't print id")
+		fmt.Fprintln(w, "Flush error, can't print id, check your internet connection")
 		return
 	}
 	f.Flush()
@@ -120,7 +120,7 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "use /submit or /check prefix")
+	fmt.Fprintln(w, "wrong command, use /submit or /check prefix")
 }
 
 func main() {
