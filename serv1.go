@@ -71,7 +71,7 @@ func startMD5(url string, uniqueID string) {
 		hasher.Write(body)
 	}
 
-	time.Sleep(0 * time.Second) // to get "running" status
+	time.Sleep(0 * time.Second) // to get "running" status, change 0 to 25 while testing
 	mu.Lock()
 	thisRequest := allRequests[uniqueID]
 	thisRequest.ready = true
@@ -109,10 +109,11 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
 	mu.Unlock()
 
 	f, erBool := w.(http.Flusher)
-	if erBool == true {
+	if erBool == false {
 		fmt.Fprintln(w, "Flush error, can't print id, check your internet connection")
 		return
 	}
+	fmt.Fprintln(w, "your id:", uniqueID)
 	f.Flush()
 
 	go startMD5(urlToUse, uniqueID) // each process starts in it's own goroutine
