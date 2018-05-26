@@ -42,3 +42,11 @@ While testing change the IDs, they are unique.
 >>> curl -X GET http://localhost:8080/check?id=e3d84aef-26cc-4c15-ada2-44fec613ebfd
 		{md5: 3494d4077d64c70ba6949e97ced47108 , status: done, url: https://www.google.com/robots.txt }
 ```
+* test 3 (race condition):
+
+	run server with following command and then test it with tests 1 or 2.
+
+    In case if there are problems with goroutines, the program will print errors, otherwise nothing
+```sh
+>>>	go run -race serv1.go
+```
