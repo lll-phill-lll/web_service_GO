@@ -12,11 +12,11 @@ The task is  to write a web service in the Go language, which allows to calculat
 ## Examples of usage:
 The following commands should be written in another terminal when the server is on:
 ```sh
->>> curl -X POST -d "url=https://www.google.com/robots.txt" http://localhost:8000/submit
+>>> curl -X POST -d "url=https://www.google.com/robots.txt" http://localhost:8080/submit
 	{"id":"0e4fac17-f367-4807-8c28-8a059a2f82ac"}
->>> curl -X GET http://localhost:8000/check?id=0e4fac17-f367-4807-8c28-8a059a2f82ac
+>>> curl -X GET http://localhost:8080/check?id=0e4fac17-f367-4807-8c28-8a059a2f82ac
 	{"status":"running"}
->>> curl -X GET http://localhost:8000/check?id=0e4fac17-f367-4807-8c28-8a059a2f82ac
+>>> curl -X GET http://localhost:8080/check?id=0e4fac17-f367-4807-8c28-8a059a2f82ac
 	{"md5":"09b67eacc3e50b9e34dcffb3771ef11e","status":"done","url":"https://www.google.com/robots.txt"}
 ```
 ## Run instructions:
@@ -25,3 +25,7 @@ The following commands should be written in another terminal when the server is 
 * Run `go run serv1.go`
 * Open new terminal and use POST or GET command with port number, given after server run (default - 8080). After entering command POST, you get the key that you can enter with GET command, to see the result of POST function.
 * You can use one of following links to check the correctness of service. All the files in given links are also avaliable in the folder "test_files", you can download them and check for example [here](http://onlinemd5.com/).
+
+## Tests:
+While testing change the IDs, they are unique.
+* 
