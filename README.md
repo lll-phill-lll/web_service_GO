@@ -24,7 +24,7 @@ The following commands should be written in another terminal when the server is 
 * Clone this repository and go to its folder.
 * Run `go run serv1.go`
 * Open new terminal and use POST or GET command with port number, given after server run (default - 8080). After entering command POST, you get the key that you can enter with GET command, to see the result of POST function.
-* You can use one of following links to check the correctness of service. All the files in given links are also avaliable in the folder "test_files", you can download them and check for example [here](http://onlinemd5.com/).
+* You can use one of following links to check the correctness of service. To find out if answer is correct copy text of file and check it for example [here](http://onlinemd5.com/).
 
 ## Tests:
 While testing change the IDs, they are unique.
