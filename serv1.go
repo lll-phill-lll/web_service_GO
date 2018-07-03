@@ -110,7 +110,7 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
 
 	f, erBool := w.(http.Flusher)
 	if erBool == false {
-		fmt.Fprintln(w, "Flush error, can't print id, check your internet connection")
+		fmt.Fprintln(w, "Flush error, can't print id")
 		return
 	}
 	fmt.Fprintln(w, "your id:", uniqueID)
