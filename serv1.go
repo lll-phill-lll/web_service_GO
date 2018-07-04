@@ -1,9 +1,9 @@
 package main
 
 import (
-	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"crypto/md5"
 	"io/ioutil"
 	"net/http"
 	"os/exec"
@@ -130,6 +130,9 @@ func main() {
 	http.HandleFunc("/", handleRoot)
 
 	fmt.Println("starting server at :8080")
-	http.ListenAndServe(":8080", nil)
+	if err := http.ListenAndServe(":8085", nil); err != nil {
+		panic(nil)
+	}
+
 
 }
