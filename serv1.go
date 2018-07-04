@@ -130,7 +130,7 @@ func main() {
 	http.HandleFunc("/", handleRoot)
 
 	fmt.Println("starting server at :8080")
-	if err := http.ListenAndServe(":8085", nil); err != nil {
+	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(nil)
 	}
 
