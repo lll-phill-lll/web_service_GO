@@ -6,9 +6,11 @@ import (
 	"crypto/md5"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"os/exec"
 	"sync"
 	"time" // to get "running"" status
+	"web_service_GO/logger"
 )
 
 type userRequest struct { // unique struct for each request
@@ -125,11 +127,13 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// choose streams for each type of logs: stderr, stdout
+	logger.SetLogger(os.Stdout, os.Stdout, os.Stdout, os.Stderr)
 	http.HandleFunc("/submit", handleSubmit)
 	http.HandleFunc("/check", handlerCheck)
 	http.HandleFunc("/", handleRoot)
 
-	fmt.Println("starting server at :8080")
+	logger.Info.Println("starting server at :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(nil)
 	}
