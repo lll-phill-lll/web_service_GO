@@ -1,10 +1,11 @@
-package serv
+package web
 
 import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"web_service_GO/logger"
 	"web_service_GO/pkg/DB"
+	"web_service_GO/pkg/calc"
 )
 
 type Server interface {
@@ -14,7 +15,7 @@ type Server interface {
 
 type DefaultServer struct {
 	DB DB.Database
-
+	Calc calc.Calc
 }
 
 func (ds * DefaultServer) panicMiddleware(next http.Handler) http.Handler {

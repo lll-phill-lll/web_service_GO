@@ -1,4 +1,4 @@
-package serv
+package web
 
 import (
 	"encoding/json"

@@ -5,22 +5,18 @@ import (
 	"web_service_GO/logger"
 	"web_service_GO/pkg/DB"
 	"web_service_GO/pkg/application"
-	"web_service_GO/serv"
+	"web_service_GO/pkg/calc"
+	"web_service_GO/web"
 )
 
-type userRequest struct { // unique struct for each request
-	md5   string
-	url   string
-	ready bool
-	id    string
-	er    bool
-}
 
 
 func InitApp() application.App {
 	db := &DB.MapDatabase{}
-	server := &serv.DefaultServer{
+	md5Calc := &calc.DefaultCalc{}
+	server := &web.DefaultServer{
 		DB: db,
+		Calc: md5Calc,
 	}
 	app := application.App{
 		DB: db,

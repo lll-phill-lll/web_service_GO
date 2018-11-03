@@ -1,19 +1,41 @@
 package DB
 
+import (
+	"errors"
+	"sync"
+	"web_service_GO/pkg/task"
+)
+
+
 type Database interface {
-	Save()
-	Load()
+	Load(string) (task.UserRequest, error)
+	Save(task.UserRequest) bool
 }
+
 
 type MapDatabase struct {
-
+	sync.RWMutex
+	db map[string]task.UserRequest
 }
 
-func (mdb *MapDatabase) Save() {
-
+func NewMapDataBase() *MapDatabase {
+	return &MapDatabase{db: map[string]task.UserRequest{}}
 }
 
+func (b *MapDatabase) Load(id string) (task.UserRequest, error) {
+	b.RLock()
+	defer b.RUnlock()
+	request, in := b.db[id]
+	if in {
+		return request, nil
+	}
+	return request, errors.New("not exist")
+}
 
-func (mdb *MapDatabase) Load() {
-
+func (b *MapDatabase) Save(request task.UserRequest) bool {
+	id := request.ID
+	b.Lock()
+	defer b.Unlock()
+	b.db[id] = request
+	return true
 }

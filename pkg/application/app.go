@@ -3,12 +3,12 @@ package application
 import (
 	"web_service_GO/pkg/DB"
 	"web_service_GO/pkg/calc"
-	"web_service_GO/serv"
+	"web_service_GO/web"
 )
 
 type App struct {
 	DB        DB.Database
-	Server    serv.Server
+	Server    web.Server
 	Processor calc.Calc
 }
 

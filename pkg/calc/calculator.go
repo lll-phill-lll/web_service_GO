@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+	"web_service_GO/pkg/DB"
 )
 
 type Calc interface {
