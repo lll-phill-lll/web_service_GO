@@ -40,9 +40,9 @@ func (ds *DefaultServer) setRouters() *mux.Router {
 
 func (ds* DefaultServer) SetEndpoints() *http.ServeMux {
 	r := ds.setRouters()
-	flyMux := http.NewServeMux()
-	flyMux.Handle("/", r)
-	return flyMux
+	Mux := http.NewServeMux()
+	Mux.Handle("/", r)
+	return Mux
 }
 
 
