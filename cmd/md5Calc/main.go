@@ -1,16 +1,9 @@
 package main
 
 import (
-	"encoding/hex"
-	"fmt"
-	"crypto/md5"
-	"io/ioutil"
-	"net/http"
 	"os"
-	"os/exec"
-	"sync"
-	"time" // to get "running"" status
 	"web_service_GO/logger"
+	"web_service_GO/pkg/DB"
 	"web_service_GO/pkg/application"
 	"web_service_GO/serv"
 )
@@ -25,8 +18,10 @@ type userRequest struct { // unique struct for each request
 
 
 func InitApp() application.App {
-	db := &DB.Database{}
-	server := &serv.DefaultServer{}
+	db := &DB.MapDatabase{}
+	server := &serv.DefaultServer{
+		DB: db,
+	}
 	app := application.App{
 		DB: db,
 		Server: server,

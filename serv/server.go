@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"web_service_GO/logger"
+	"web_service_GO/pkg/DB"
 )
 
 type Server interface {
@@ -12,6 +13,7 @@ type Server interface {
 }
 
 type DefaultServer struct {
+	DB DB.Database
 
 }
 
