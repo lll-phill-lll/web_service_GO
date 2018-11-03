@@ -18,7 +18,7 @@ type DefaultCalc struct {
 	db * DB.Database
 }
 
-func (dc * DefaultCalc) CalculateMD5(url string) {
+func (dc * DefaultCalc) CalculateMD5(id string) {
 	response, er := http.Get(url)
 	if er != nil {
 		fmt.Println("Get url error. ID=", uniqueID)

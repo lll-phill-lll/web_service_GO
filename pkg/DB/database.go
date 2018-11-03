@@ -9,7 +9,7 @@ import (
 
 type Database interface {
 	Load(string) (task.UserRequest, error)
-	Save(task.UserRequest) bool
+	Save(task.UserRequest)
 }
 
 
@@ -32,10 +32,9 @@ func (b *MapDatabase) Load(id string) (task.UserRequest, error) {
 	return request, errors.New("not exist")
 }
 
-func (b *MapDatabase) Save(request task.UserRequest) bool {
+func (b *MapDatabase) Save(request task.UserRequest) {
 	id := request.ID
 	b.Lock()
 	defer b.Unlock()
 	b.db[id] = request
-	return true
 }

@@ -1,9 +1,9 @@
 package task
 
 type UserRequest struct {
-	md5   string
-	url   string
-	ready bool
+	MD5   string
+	URL   string
+	Ready bool
 	ID    string
-	er    bool
+	Err    bool
 }

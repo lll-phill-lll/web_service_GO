@@ -5,40 +5,40 @@ import (
 	"fmt"
 	"net/http"
 	"os/exec"
+	"web_service_GO/logger"
+	"web_service_GO/pkg/task"
 )
 
 func (ds * DefaultServer)handleSubmit(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		fmt.Fprintln(w, "Should be method POST with /submit")
-		return
-	}
+	logger.Info.Println("New submit request")
 
 	urlToUse := r.FormValue("url")
 
-	byteID, er := exec.Command("uuidgen").Output() // use POSIX command to generate unique key
-	if er != nil {
-		fmt.Fprintln(w, "uuidgen error, can't generate id")
+	byteID, err := exec.Command("uuidgen").Output() // use POSIX command to generate unique key
+	if err != nil {
+		logger.Error.Println("Can't generate uuid", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintln(w, "Can't generate id")
 		return
 	}
 	uniqueID := string(byteID)
-	var req userRequest = userRequest{
-		id:  uniqueID,
-		url: urlToUse,
+	req := task.UserRequest {
+		ID:  uniqueID,
+		URL: urlToUse,
 	}
 
-	mu.Lock()
-	allRequests[uniqueID] = req
-	mu.Unlock()
+	ds.DB.Save(req)
 
 	f, erBool := w.(http.Flusher)
 	if erBool == false {
+		logger.Error.Println("Flush error")
 		fmt.Fprintln(w, "Flush error, can't print id")
 		return
 	}
-	fmt.Fprintln(w, "your id:", uniqueID)
+	fmt.Fprintln(w, "Your id:", uniqueID)
 	f.Flush()
 
-	go startMD5(urlToUse, uniqueID) // each process starts in it's own goroutine
+	go ds.Calc.CalculateMD5(uniqueID) // each process starts in it's own goroutine
 }
 
 func (ds * DefaultServer)handleCheck(w http.ResponseWriter, r *http.Request) {
