@@ -22,13 +22,13 @@ func (dc * DefaultCalc) CalculateMD5(id string, url string) {
 	request := task.UserRequest{
 		ID: id,
 		URL: url,
-		Status: "Running",
+		Status: task.RequestStatus.Running,
 	}
 	dc.DB.Save(request)
 	response, err := http.Get(url)
 	if err != nil {
 		logger.Error.Println("Get url error. ID=", id)
-		request.Status = "Failed"
+		request.Status = task.RequestStatus.Failed
 		dc.DB.Save(request)
 		return
 	}
@@ -40,7 +40,7 @@ func (dc * DefaultCalc) CalculateMD5(id string, url string) {
 	body, err = ioutil.ReadAll(response.Body)
 	if err != nil {
 		logger.Error.Println("Error while getting file body. ID=", id)
-		request.Status = "Failed"
+		request.Status = task.RequestStatus.Failed
 		dc.DB.Save(request)
 		return
 	}
@@ -49,6 +49,6 @@ func (dc * DefaultCalc) CalculateMD5(id string, url string) {
 	hasher.Write(body)
 
 	request.MD5 = hex.EncodeToString(hasher.Sum(nil))
-	request.Status = "Ready"
+	request.Status = task.RequestStatus.Ready
 	dc.DB.Save(request)
 }

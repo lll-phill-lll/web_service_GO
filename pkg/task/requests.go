@@ -6,3 +6,14 @@ type UserRequest struct {
 	ID    string	`json:"id"`
 	Status string	`json:"status"`
 }
+
+var RequestStatus = struct {
+	Failed string
+	Ready string
+	Running string
+
+}{
+	"failed",
+	"ready",
+	"running",
+}
