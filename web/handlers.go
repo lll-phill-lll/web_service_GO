@@ -1,33 +1,30 @@
 package web
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 	"os/exec"
+	"strings"
 	"web_service_GO/logger"
 	"web_service_GO/pkg/task"
 )
 
-func (ds * DefaultServer)handleSubmit(w http.ResponseWriter, r *http.Request) {
-	logger.Info.Println("New submit request")
-
+func (ds *DefaultServer)handleSubmit(w http.ResponseWriter, r *http.Request) {
 	urlToUse := r.FormValue("url")
 
 	byteID, err := exec.Command("uuidgen").Output() // use POSIX command to generate unique key
 	if err != nil {
-		logger.Error.Println("Can't generate uuid", err)
+		logger.Error.Println("Can't generate uuid, to request:", urlToUse,  err)
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintln(w, "Can't generate id")
 		return
 	}
-	uniqueID := string(byteID)
-	req := task.UserRequest {
-		ID:  uniqueID,
-		URL: urlToUse,
-	}
+	uniqueID := strings.TrimSpace(string(byteID))
 
-	ds.DB.Save(req)
+	w.WriteHeader(http.StatusAccepted)
+	fmt.Fprintln(w, "Your id:", uniqueID)
 
 	f, erBool := w.(http.Flusher)
 	if erBool == false {
@@ -35,8 +32,16 @@ func (ds * DefaultServer)handleSubmit(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Flush error, can't print id")
 		return
 	}
-	fmt.Fprintln(w, "Your id:", uniqueID)
 	f.Flush()
+
+	logger.Info.Println("New submit request, id = ", uniqueID)
+
+	req := task.UserRequest {
+		ID:  uniqueID,
+		URL: urlToUse,
+	}
+
+	ds.DB.Save(req)
 
 	go ds.Calc.CalculateMD5(uniqueID, urlToUse) // each process starts in it's own goroutine
 }
@@ -50,13 +55,20 @@ func (ds * DefaultServer)handleCheck(w http.ResponseWriter, r *http.Request) {
 	}
 	request, err := ds.DB.Load(id)
 	if err != nil {
-		logger.Info.Println(id, " now found in database")
+		logger.Info.Println(id, "not found in database")
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintln(w, id, "not found")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, request)
+	w.Header().Set("Content-Type", "application/json")
+	ret, err := json.Marshal(request)
+	if err != nil {
+		logger.Error.Println("Can't marshal json", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintln(w, string(ret))
 }
 
 func (ds * DefaultServer)handleRoot(w http.ResponseWriter, r *http.Request) {
