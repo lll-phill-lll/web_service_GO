@@ -53,3 +53,7 @@ While testing change the IDs, they are unique.
 ```sh
 >>>	go run -race serv1.go
 ```
+
+## TODO:
+* Add tests.
+* Add pagination for large texts.
