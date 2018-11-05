@@ -3,6 +3,7 @@ package web
 import (
 	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 	"web_service_GO/logger"
 	"web_service_GO/pkg/DB"
 	"web_service_GO/pkg/calc"
@@ -58,7 +59,7 @@ func (ds* DefaultServer) StartServe(portNum int) {
 	mux := ds.SetEndpoints()
 	handler := ds.SetMiddlewares(mux)
 	logger.Info.Println("Starting server at :", portNum)
-	if err := http.ListenAndServe(string(portNum), handler); err != nil {
+	if err := http.ListenAndServe(":" + strconv.Itoa(portNum), handler); err != nil {
 		logger.Error.Println("Can't start serving, check port num", err)
 	}
 }

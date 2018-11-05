@@ -1,8 +1,8 @@
 package web
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 	"os/exec"
 	"web_service_GO/logger"
@@ -38,47 +38,28 @@ func (ds * DefaultServer)handleSubmit(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Your id:", uniqueID)
 	f.Flush()
 
-	go ds.Calc.CalculateMD5(uniqueID) // each process starts in it's own goroutine
+	go ds.Calc.CalculateMD5(uniqueID, urlToUse) // each process starts in it's own goroutine
 }
 
 func (ds * DefaultServer)handleCheck(w http.ResponseWriter, r *http.Request) {
-	myParam := r.URL.Query().Get("id")
-
-	if myParam != "" {
-		myParam += "\n"
-		mu.Lock()
-		i, inMap := allRequests[myParam]
-		mu.Unlock()
-
-		if inMap {
-			if i.ready {
-				if i.er {
-					fmt.Fprintln(w, "Error during md5 computing")
-				} else {
-					fmt.Fprintln(w, "{md5:", i.md5, ", status: done, url:", i.url, "}")
-				}
-			} else {
-				fmt.Fprintln(w, "{status : running}")
-			}
-		} else {
-			fmt.Fprintln(w, "{Not exist}")
-		}
-	} else {
-		fmt.Fprintf(w, "incorrect request. Id error.")
+	logger.Info.Println("New request to ", r.URL)
+	id, found := mux.Vars(r)["id"]
+	if !found {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintln(w, "Wrong request, should be /check/<id>")
 	}
+	request, err := ds.DB.Load(id)
+	if err != nil {
+		logger.Info.Println(id, " now found in database")
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintln(w, id, "not found")
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintln(w, request)
 }
 
 func (ds * DefaultServer)handleRoot(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var t api.UserRequest
-	if err := decoder.Decode(&t); err != nil {
-		logger.Error.Println("Status:", http.StatusBadRequest, err)
-		sendResponse(http.StatusBadRequest, "Bad Request", r, w)
-		return
-	}
-
-	logger.Info.Println("Status:", http.StatusAccepted, "Request:", r.Host, r.URL.Path)
-	sendResponse(http.StatusAccepted, "Accepted", r, w)
-
-	go docker.Run(t, r.Host, r.URL.Path) // use go to run process ib new goroutine
+	w.WriteHeader(http.StatusBadRequest)
+	fmt.Fprintln(w, "Wrong path, use /check /submit instead")
 }

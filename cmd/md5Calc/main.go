@@ -12,8 +12,10 @@ import (
 
 
 func InitApp() application.App {
-	db := &DB.MapDatabase{}
-	md5Calc := &calc.DefaultCalc{}
+	db := DB.NewMapDataBase()
+	md5Calc := &calc.DefaultCalc{
+		DB: db,
+	}
 	server := &web.DefaultServer{
 		DB: db,
 		Calc: md5Calc,

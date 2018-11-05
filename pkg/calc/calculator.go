@@ -3,52 +3,52 @@ package calc
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
+	"web_service_GO/logger"
 	"web_service_GO/pkg/DB"
+	"web_service_GO/pkg/task"
 )
 
 type Calc interface {
-	CalculateMD5(string)
+	CalculateMD5(string, string)
 }
 
 type DefaultCalc struct {
-	db * DB.Database
+	DB DB.Database
 }
 
-func (dc * DefaultCalc) CalculateMD5(id string) {
-	response, er := http.Get(url)
-	if er != nil {
-		fmt.Println("Get url error. ID=", uniqueID)
+func (dc * DefaultCalc) CalculateMD5(id string, url string) {
+	request := task.UserRequest{
+		ID: id,
+		URL: url,
+		Status: "Running",
+	}
+	dc.DB.Save(request)
+	response, err := http.Get(url)
+	if err != nil {
+		logger.Error.Println("Get url error. ID=", id)
+		request.Status = "Failed"
+		dc.DB.Save(request)
+		return
 	}
 
-	var body []byte
-	if er == nil {
-		defer response.Body.Close()
 
-		body, er = ioutil.ReadAll(response.Body)
-		if er != nil {
-			fmt.Println("Error while getting file body. ID=", uniqueID)
-		}
+	var body []byte
+	defer response.Body.Close()
+
+	body, err = ioutil.ReadAll(response.Body)
+	if err != nil {
+		logger.Error.Println("Error while getting file body. ID=", id)
+		request.Status = "Failed"
+		dc.DB.Save(request)
+		return
 	}
 
 	hasher := md5.New()
-	if er == nil {
-		hasher.Write(body)
-	}
+	hasher.Write(body)
 
-	time.Sleep(0 * time.Second) // to get "running" status, change 0 to 25 while testing
-	mu.Lock()
-	thisRequest := allRequests[uniqueID]
-	thisRequest.ready = true
-	if er == nil { // check if there errors while saving file and computing md5
-		thisRequest.md5 = hex.EncodeToString(hasher.Sum(nil))
-	} else {
-		thisRequest.er = true
-	}
-	delete(allRequests, uniqueID)
-	allRequests[uniqueID] = thisRequest
-	mu.Unlock()
+	request.MD5 = hex.EncodeToString(hasher.Sum(nil))
+	request.Status = "Ready"
+	dc.DB.Save(request)
 }
