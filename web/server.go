@@ -15,11 +15,11 @@ type Server interface {
 }
 
 type DefaultServer struct {
-	DB DB.Database
+	DB   DB.Database
 	Calc calc.Calc
 }
 
-func (ds * DefaultServer) panicMiddleware(next http.Handler) http.Handler {
+func (ds *DefaultServer) panicMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
@@ -39,27 +39,24 @@ func (ds *DefaultServer) setRouters() *mux.Router {
 	return r
 }
 
-func (ds* DefaultServer) SetEndpoints() *http.ServeMux {
+func (ds *DefaultServer) SetEndpoints() *http.ServeMux {
 	r := ds.setRouters()
 	Mux := http.NewServeMux()
 	Mux.Handle("/", r)
 	return Mux
 }
 
-
-
-func (ds* DefaultServer) SetMiddlewares(mux *http.ServeMux) http.Handler {
+func (ds *DefaultServer) SetMiddlewares(mux *http.ServeMux) http.Handler {
 	// Other middlewares may be easily added
 	handler := ds.panicMiddleware(mux)
 	return handler
 }
 
-
-func (ds* DefaultServer) StartServe(portNum int) {
+func (ds *DefaultServer) StartServe(portNum int) {
 	mux := ds.SetEndpoints()
 	handler := ds.SetMiddlewares(mux)
 	logger.Info.Println("Starting server at :", portNum)
-	if err := http.ListenAndServe(":" + strconv.Itoa(portNum), handler); err != nil {
+	if err := http.ListenAndServe(":"+strconv.Itoa(portNum), handler); err != nil {
 		logger.Error.Println("Can't start serving, check port num", err)
 	}
 }

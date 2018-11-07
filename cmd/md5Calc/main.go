@@ -9,19 +9,17 @@ import (
 	"web_service_GO/web"
 )
 
-
-
 func InitApp() application.App {
 	db := DB.NewMapDataBase()
 	md5Calc := &calc.DefaultCalc{
 		DB: db,
 	}
 	server := &web.DefaultServer{
-		DB: db,
+		DB:   db,
 		Calc: md5Calc,
 	}
 	app := application.App{
-		DB: db,
+		DB:     db,
 		Server: server,
 	}
 	return app

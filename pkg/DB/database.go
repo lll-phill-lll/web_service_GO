@@ -6,12 +6,10 @@ import (
 	"web_service_GO/pkg/task"
 )
 
-
 type Database interface {
 	Load(string) (task.UserRequest, error)
 	Save(task.UserRequest)
 }
-
 
 type MapDatabase struct {
 	sync.RWMutex

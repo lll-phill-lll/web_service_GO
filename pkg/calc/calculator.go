@@ -18,10 +18,10 @@ type DefaultCalc struct {
 	DB DB.Database
 }
 
-func (dc * DefaultCalc) CalculateMD5(id string, url string) {
+func (dc *DefaultCalc) CalculateMD5(id string, url string) {
 	request := task.UserRequest{
-		ID: id,
-		URL: url,
+		ID:     id,
+		URL:    url,
 		Status: task.RequestStatus.Running,
 	}
 	dc.DB.Save(request)
@@ -32,7 +32,6 @@ func (dc * DefaultCalc) CalculateMD5(id string, url string) {
 		dc.DB.Save(request)
 		return
 	}
-
 
 	var body []byte
 	defer response.Body.Close()

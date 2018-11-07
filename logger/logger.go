@@ -1,8 +1,8 @@
 package logger
 
 import (
-	"log"
 	"io"
+	"log"
 	"os"
 )
 
@@ -20,13 +20,13 @@ func SetLogger(traceHandle io.Writer,
 	warningHandle io.Writer,
 	errorHandle io.Writer) {
 
-	file, err := os.OpenFile("FlyLogs.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)	// file for logs
+	file, err := os.OpenFile("FlyLogs.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666) // file for logs
 	if err != nil {
 		log.Println("Failed to open log file:", err)
 	}
 
-	outTrace := io.MultiWriter(file, traceHandle)	// copy logs stream to file
-	outInfo:= io.MultiWriter(file, infoHandle)
+	outTrace := io.MultiWriter(file, traceHandle) // copy logs stream to file
+	outInfo := io.MultiWriter(file, infoHandle)
 	outWarning := io.MultiWriter(file, warningHandle)
 	outError := io.MultiWriter(file, errorHandle)
 
