@@ -45,6 +45,7 @@ func (ds *DefaultServer) handleSubmit(w http.ResponseWriter, r *http.Request) {
 	ds.DB.Save(req)
 
 	go ds.Calc.CalculateMD5(uniqueID) // each process starts in it's own goroutine
+	logger.Info.Println("Started computing. id =", req.ID)
 }
 
 func (ds *DefaultServer) handleCheck(w http.ResponseWriter, r *http.Request) {
