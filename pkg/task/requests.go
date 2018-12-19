@@ -8,10 +8,12 @@ type UserRequest struct {
 }
 
 var RequestStatus = struct {
+	Waiting string
 	Failed  string
 	Ready   string
 	Running string
 }{
+	"waiting",
 	"failed",
 	"ready",
 	"running",

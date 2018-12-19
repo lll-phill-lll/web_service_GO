@@ -11,25 +11,31 @@ import (
 )
 
 type Calc interface {
-	CalculateMD5(string, string)
+	CalculateMD5(string)
 }
 
 type DefaultCalc struct {
 	DB DB.Database
 }
 
-func (dc *DefaultCalc) CalculateMD5(id string, url string) {
-	request := task.UserRequest{
-		ID:     id,
-		URL:    url,
-		Status: task.RequestStatus.Running,
-	}
-	dc.DB.Save(request)
-	response, err := http.Get(url)
+func (dc *DefaultCalc) CalculateMD5(id string) {
+	currentTask, err := dc.DB.Load(id)
 	if err != nil {
-		logger.Error.Println("Get url error. ID=", id)
-		request.Status = task.RequestStatus.Failed
-		dc.DB.Save(request)
+		logger.Error.Println("Task not found in database, id:", id)
+		currentTask = task.UserRequest{
+			ID:     id,
+			URL:    "",
+			Status: task.RequestStatus.Failed,
+		}
+		return
+	}
+	currentTask.Status = task.RequestStatus.Running
+	dc.DB.Save(currentTask)
+	response, err := http.Get(currentTask.URL)
+	if err != nil {
+		logger.Error.Println("Can't load file. Error:", err, "ID =", id, "URL = ", currentTask.URL)
+		currentTask.Status = task.RequestStatus.Failed
+		dc.DB.Save(currentTask)
 		return
 	}
 
@@ -39,15 +45,15 @@ func (dc *DefaultCalc) CalculateMD5(id string, url string) {
 	body, err = ioutil.ReadAll(response.Body)
 	if err != nil {
 		logger.Error.Println("Error while getting file body. ID=", id)
-		request.Status = task.RequestStatus.Failed
-		dc.DB.Save(request)
+		currentTask.Status = task.RequestStatus.Failed
+		dc.DB.Save(currentTask)
 		return
 	}
 
 	hasher := md5.New()
 	hasher.Write(body)
 
-	request.MD5 = hex.EncodeToString(hasher.Sum(nil))
-	request.Status = task.RequestStatus.Ready
-	dc.DB.Save(request)
+	currentTask.MD5 = hex.EncodeToString(hasher.Sum(nil))
+	currentTask.Status = task.RequestStatus.Ready
+	dc.DB.Save(currentTask)
 }

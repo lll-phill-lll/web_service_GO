@@ -33,14 +33,14 @@ The following commands should be written in another terminal when the server is 
 While testing change the IDs, they are unique.
 * test 1 (ordinary situation):
 ```sh
->>> curl -X POST -d "https://www.ietf.org/rfc/rfc4288.txt" http://localhost:8080/submit
+>>> curl -X POST -d "url=https://www.ietf.org/rfc/rfc4288.txt" http://localhost:8080/submit
         your id: 5742d2b0-b749-434d-825e-c7bcba08adc9
 >>> curl -X GET http://localhost:8080/check/5742d2b0-b749-434d-825e-c7bcba08adc9
 		{md5: c60ceb913dfb0adceebea2e1578e5225 , status: done, url: https://www.ietf.org/rfc/rfc4288.txt }
 ```
 * test 2 (ordinary situation):
 ```sh
->>> curl -X POST -d "https://www.google.com/robots.txt" http://localhost:8080/submit
+>>> curl -X POST -d "url=https://www.google.com/robots.txt" http://localhost:8080/submit
         your id: e3d84aef-26cc-4c15-ada2-44fec613ebfd
 >>> curl -X GET http://localhost:8080/check/e3d84aef-26cc-4c15-ada2-44fec613ebfd
 		{md5: 3494d4077d64c70ba6949e97ced47108 , status: done, url: https://www.google.com/robots.txt }

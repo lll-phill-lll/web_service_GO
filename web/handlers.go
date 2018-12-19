@@ -39,11 +39,12 @@ func (ds *DefaultServer) handleSubmit(w http.ResponseWriter, r *http.Request) {
 	req := task.UserRequest{
 		ID:  uniqueID,
 		URL: urlToUse,
+		Status: task.RequestStatus.Waiting,
 	}
 
 	ds.DB.Save(req)
 
-	go ds.Calc.CalculateMD5(uniqueID, urlToUse) // each process starts in it's own goroutine
+	go ds.Calc.CalculateMD5(uniqueID) // each process starts in it's own goroutine
 }
 
 func (ds *DefaultServer) handleCheck(w http.ResponseWriter, r *http.Request) {
