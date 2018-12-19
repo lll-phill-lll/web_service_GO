@@ -55,5 +55,6 @@ func (dc *DefaultCalc) CalculateMD5(id string) {
 
 	currentTask.MD5 = hex.EncodeToString(hasher.Sum(nil))
 	currentTask.Status = task.RequestStatus.Ready
+	logger.Info.Println("MD5 computed for id=", currentTask.ID)
 	dc.DB.Save(currentTask)
 }
